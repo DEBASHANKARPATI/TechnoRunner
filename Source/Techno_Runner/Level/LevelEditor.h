@@ -4,16 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "PathSpawner.generated.h"
+#include "Containers/Queue.h"
+#include "LevelEditor.generated.h"
+class ASplinePointGenerator;
+
+/// <summary>
+/// Responsible for generating level proccedurally
+/// </summary>
 
 UCLASS()
-class TECHNO_RUNNER_API APathSpawner : public AActor
+class TECHNO_RUNNER_API ALevelEditor : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	APathSpawner();
+	ALevelEditor();
 
 protected:
 	// Called when the game starts or when spawned
@@ -23,12 +29,11 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<ASplinePointGenerator> SplinePointGeneratorAsset;
+
+private:
 	UPROPERTY(VisibleAnywhere)
-	TArray<FVector> PositionList;
-
-	UPROPERTY(EditAnywhere)
-	TArray<float> YawRotation{-90.0f , 90.0f , 0.0f , 0.0f , 0.0f};
-
-	void CreatePath();
-
+	ASplinePointGenerator* SplinePointGenerator;
+	
 };
