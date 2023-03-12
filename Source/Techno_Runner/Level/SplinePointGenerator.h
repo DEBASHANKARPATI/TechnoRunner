@@ -7,12 +7,14 @@
 #include "SplinePointGenerator.generated.h"
 class USplineComponent;
 class USplineMeshComponent;
+class APathTracer;
+class AMainPlayer;
+class APool;
 
 /// <summary>
 /// Responsible for Creating spline points and populating the spline with Mesh and props 
 /// </summary>
-class APathTracer;
-class AMainPlayer;
+
 
 UCLASS()
 class TECHNO_RUNNER_API ASplinePointGenerator : public AActor
@@ -54,19 +56,25 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	TArray<FVector> PositionList;
 
-	void SpawnChunk(float Distance);
+	//void SpawnChunk(float Distance);
 
 	void RecyclePathPoints();
 
 	void OnDesiredDistanceCovered(bool bWasSuccessful);
-private:
-	float CurrentDistance = 0;
 
+	int GetSegmentLength() const;
+
+	USplineComponent* GetSplineComponent() const;
+
+private:
 	UPROPERTY(VisibleAnywhere)
 	APathTracer* PathTracer;
 
 	UPROPERTY(VisibleAnywhere)
 	AMainPlayer* MainPlayer;
+
+	UPROPERTY(VisibleAnywhere)
+	APool* ObjectPool;
 
 
 };

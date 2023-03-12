@@ -3,6 +3,11 @@
 
 #include "MainPlayer.h"
 #include <GameFramework/CharacterMovementComponent.h>
+#include <Techno_Runner/Core/GameInstance/TechnoRunnerGameInstance.h> 
+#include <Techno_Runner/Level/LevelEditor.h>
+#include <Techno_Runner/Level/SplinePointGenerator.h>
+#include <Components/SplineComponent.h>
+
 // Sets default values
 AMainPlayer::AMainPlayer()
 {
@@ -16,6 +21,18 @@ void AMainPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (const UWorld* World = GetWorld())
+	{
+		if (const UTechnoRunnerGameInstance* GameInstance = Cast<UTechnoRunnerGameInstance>(GetWorld()->GetGameInstance()))
+		{
+			if (const auto LevelEditor = GameInstance->GetLevelEditor())
+			{
+				SplineGenerator = LevelEditor->GetSplinePointGenerator();
+			}
+		}
+	}
+
+
 	if (const auto CharacterMovementComponentClone =GetCharacterMovement())
 	{
 		CharacterMovementComponent = CharacterMovementComponentClone;
@@ -28,7 +45,8 @@ void AMainPlayer::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	if (CharacterMovementComponent && CharacterMovementComponent->IsMovingOnGround())
 	{
-		DistanceCovered += CharacterMovementComponent->Velocity.Length()*DeltaTime;
+		DistanceCovered += CharacterMovementComponent->Velocity.Length() * DeltaTime;
+		AddMovementInput(GetActorForwardVector(), DistanceCovered);
 		if (DistanceCovered > 400)
 		{
 			DistanceCovered = 0.0f;

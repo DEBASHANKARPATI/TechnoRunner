@@ -8,14 +8,12 @@ APathTracer::APathTracer()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 }
 
 // Called when the game starts or when spawned
 void APathTracer::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
@@ -29,20 +27,21 @@ void APathTracer::GeneratePathPoints(TArray<FVector>& PositionList , int SpawnCo
 	int Stride = 400; // what is the distance between the end and start of a chunk .i.e offset
 	int RoatationPoint = 50; // offset for rotation
 
-	PositionList.Add(GetActorLocation());
-
 	int i = PositionList.Num();
 	int TotalPointsToSpawn = i + SpawnCount;
+
+	if (RotationTriggerCounter % 50 == 0)
+	{
+		SetActorRotation(FRotator(0, GetActorRotation().Yaw + YawRotation[FMath::RandRange(0, 4)], 0));
+	}
+
 	while (i != TotalPointsToSpawn)
 	{
-		if (i % RoatationPoint == 0)
-		{
-			SetActorRotation(FRotator(0, GetActorRotation().Yaw + YawRotation[FMath::RandRange(0, 4)], 0));
-		}
-
 		FVector NewLocation = FVector(GetActorLocation() + GetActorForwardVector() * Stride);
 		SetActorLocation(NewLocation);
 		PositionList.Add(NewLocation);
 		i++;
 	}
+
+	RotationTriggerCounter++;
 }

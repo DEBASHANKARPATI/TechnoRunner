@@ -32,6 +32,8 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	TSubclassOf<ASplinePointGenerator> SplinePointGeneratorAsset;
 
+	ASplinePointGenerator* GetSplinePointGenerator() const;
+
 private:
 	UPROPERTY(VisibleAnywhere)
 	ASplinePointGenerator* SplinePointGenerator;

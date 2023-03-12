@@ -1,12 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SplinePointGenerator.h"
 #include <Components/SplineComponent.h>
 #include <Components/SplineMeshComponent.h>
 #include <Techno_Runner/Level/PathTracer.h>
 #include <Techno_Runner/Core/Controller/MainPlayerController.h>
 #include <Techno_Runner/Player/MainPlayer.h>
+#include <Techno_Runner/Core/Optimization/Pool.h>
+#include <Techno_Runner/Core/GameInstance/TechnoRunnerGameInstance.h>
+
 // Sets default values
 ASplinePointGenerator::ASplinePointGenerator()
 {
@@ -39,76 +40,40 @@ void ASplinePointGenerator::BeginPlay()
 			}
 		}
 
+		if (const auto GameInstance = Cast<UTechnoRunnerGameInstance>(World->GetGameInstance()))
+		{
+			ObjectPool = GameInstance->GetPool();
+		}
+
 		if (PathTracerAsset)
 		{
 			if (const auto PathTracerClone = World->SpawnActor<APathTracer>(PathTracerAsset))
 			{
 				PathTracer = PathTracerClone;
-				PathTracer->GeneratePathPoints(PositionList);
+				PathTracer->GeneratePathPoints(PositionList,50);
 
 				for (int i = 0; i < PositionList.Num(); i++)
 				{
 					PathSpline->AddSplineLocalPoint(PositionList[i]);
 				}
 
-				int i = 0;
-				while (CurrentDistance < PathSpline->GetSplineLength())
-				{
-					SpawnChunk(FMath::Min(CurrentDistance, PathSpline->GetSplineLength()));
-					CurrentDistance += SegmentLength;
-				}
-				/*FTimerHandle SpawnTimer;
-				GetWorldTimerManager().SetTimer(SpawnTimer, this, &ASplinePointGenerator::RecyclePathPoints, 2.5f, true);*/
+				ObjectPool->InstantiateSplineMeshes(PathSpline,PathMaterial,PathMesh,SegmentLength);
 			}
 		}
 	}
-
-	
 }
 
 // Called every frame
 void ASplinePointGenerator::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	//RecyclePathPoints();
-}
-
-void ASplinePointGenerator::SpawnChunk(float Distance)
-{
-	//Optimize this using Object pool
-	USplineMeshComponent* SplineMesh = NewObject<USplineMeshComponent>(this);
-	SplineMesh->RegisterComponent();
-	SplineMesh->SetMobility(EComponentMobility::Movable);
-
-	FVector StartPosition = PathSpline->GetLocationAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::Local);
-	FVector EndPosition = PathSpline->GetLocationAtDistanceAlongSpline(Distance + SegmentLength, ESplineCoordinateSpace::Local);
-
-	FVector StartTangent = PathSpline->GetTangentAtDistanceAlongSpline(Distance, ESplineCoordinateSpace::Local);
-	FVector EndTangent = PathSpline->GetTangentAtDistanceAlongSpline(Distance + SegmentLength, ESplineCoordinateSpace::Local);
-
-
-	FVector2D StartScale = FVector2D(PathSpline->GetScaleAtDistanceAlongSpline(Distance));
-	FVector2D EndScale = FVector2D(PathSpline->GetScaleAtDistanceAlongSpline(Distance + SegmentLength));
-
-	SplineMesh->SetStartAndEnd(StartPosition, StartTangent, EndPosition, EndTangent);
-	SplineMesh->SetStartScale(StartScale);
-	SplineMesh->SetEndScale(StartScale);
-
-	SplineMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	SplineMesh->SetStaticMesh(PathMesh);
-	SplineMesh->SetMaterial(0, PathMaterial);
-	SplineMesh->SetForwardAxis(ESplineMeshAxis::X);
-	SplineMesh->AttachToComponent(PathSpline, FAttachmentTransformRules::FAttachmentTransformRules(EAttachmentRule::KeepRelative, true));
-	SplineMeshComponentList.Add(SplineMesh);
 }
 
 void ASplinePointGenerator::RecyclePathPoints()
 {
 	int PreviousCount = PositionList.Num();
-	CurrentDistance = PathSpline->GetSplineLength();
+	float PreviousSplineLength = PathSpline->GetSplineLength();
 
-
-	//float DistanceCoveredByPlayerAlongSpline = FVector::Distance(PathSpline->GetWorldLocationAtDistanceAlongSpline(0) ,  MainPlayer->GetActorLocation());
 	int NumberOfSplinePoints = 1; //floor(DistanceCoveredByPlayerAlongSpline / SegmentLength);
 
 	//Appending the path points
@@ -119,19 +84,10 @@ void ASplinePointGenerator::RecyclePathPoints()
 		PathSpline->AddSplineLocalPoint(PositionList[i]);
 	}
 
-	while (CurrentDistance < PathSpline->GetSplineLength())
-	{
-		SpawnChunk(FMath::Min(CurrentDistance, PathSpline->GetSplineLength()));
-		CurrentDistance += SegmentLength;
-	}
+	ObjectPool->RecycleSplineMeshes(PathSpline , PreviousSplineLength , PathMaterial , PathMesh , SegmentLength , NumberOfSplinePoints);
 
-	//Removing path points
 	for (int i = 0; i < NumberOfSplinePoints; i++)
 	{
-		USplineMeshComponent* ElementToRemove;
-		ElementToRemove = *SplineMeshComponentList.begin();
-		SplineMeshComponentList.Remove(ElementToRemove);
-		ElementToRemove->DestroyComponent();
 		PathSpline->RemoveSplinePoint(i);
 	}
 }
@@ -139,4 +95,14 @@ void ASplinePointGenerator::RecyclePathPoints()
 void ASplinePointGenerator::OnDesiredDistanceCovered(bool bWasSuccessful)
 {
 	RecyclePathPoints();
+}
+
+int ASplinePointGenerator::GetSegmentLength() const
+{
+	return SegmentLength;
+}
+
+USplineComponent* ASplinePointGenerator::GetSplineComponent() const
+{
+	return PathSpline;
 }

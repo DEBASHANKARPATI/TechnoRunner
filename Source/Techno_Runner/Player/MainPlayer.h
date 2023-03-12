@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "MainPlayer.generated.h"
 class UCharacterMovementComponent;
-
+class ASplinePointGenerator;
 DECLARE_MULTICAST_DELEGATE_OneParam (FOnDesiredDistanceCovered , bool);
 UCLASS()
 class TECHNO_RUNNER_API AMainPlayer : public ACharacter
@@ -30,4 +30,6 @@ public:
 
 private:
 	UCharacterMovementComponent* CharacterMovementComponent = nullptr;
+	ASplinePointGenerator* SplineGenerator;
+
 };
