@@ -33,7 +33,7 @@ void AMainPlayer::BeginPlay()
 	}
 
 
-	if (const auto CharacterMovementComponentClone =GetCharacterMovement())
+	if (const auto CharacterMovementComponentClone = GetCharacterMovement())
 	{
 		CharacterMovementComponent = CharacterMovementComponentClone;
 	}
@@ -43,7 +43,7 @@ void AMainPlayer::BeginPlay()
 void AMainPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (CharacterMovementComponent && CharacterMovementComponent->IsMovingOnGround())
+	if (CharacterMovementComponent)
 	{
 		DistanceCovered += CharacterMovementComponent->Velocity.Length() * DeltaTime;
 		AddMovementInput(GetActorForwardVector(), DistanceCovered);

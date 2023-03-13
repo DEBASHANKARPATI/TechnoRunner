@@ -53,27 +53,24 @@ void APool::RecycleSplineMeshes(USplineComponent* const TargetSpline , float Pre
 { 
 	float CurrentDistance = TargetSpline->GetSplineLength() - SegmentLength;
 
-	/*while (SplineMeshIndex < SplineMeshComponentList.Num())
-	{*/
-		
-		if (USplineMeshComponent* const SplineMesh = SplineMeshComponentList[0])
-		{
-			FVector StartPosition = TargetSpline->GetLocationAtDistanceAlongSpline( CurrentDistance, ESplineCoordinateSpace::Local);
-			FVector EndPosition = TargetSpline->GetLocationAtDistanceAlongSpline( CurrentDistance + SegmentLength, ESplineCoordinateSpace::Local);
+	if (USplineMeshComponent* const SplineMesh = SplineMeshComponentList[0])
+	{
+		FVector StartPosition = TargetSpline->GetLocationAtDistanceAlongSpline( CurrentDistance, ESplineCoordinateSpace::Local);
+		FVector EndPosition = TargetSpline->GetLocationAtDistanceAlongSpline( CurrentDistance + SegmentLength, ESplineCoordinateSpace::Local);
 
-			FVector StartTangent = TargetSpline->GetTangentAtDistanceAlongSpline(CurrentDistance, ESplineCoordinateSpace::Local);
-			FVector EndTangent = TargetSpline->GetTangentAtDistanceAlongSpline(CurrentDistance + SegmentLength , ESplineCoordinateSpace::Local);
+		FVector StartTangent = TargetSpline->GetTangentAtDistanceAlongSpline(CurrentDistance, ESplineCoordinateSpace::Local);
+		FVector EndTangent = TargetSpline->GetTangentAtDistanceAlongSpline(CurrentDistance + SegmentLength , ESplineCoordinateSpace::Local);
 
 
-			FVector2D StartScale = FVector2D(TargetSpline->GetScaleAtDistanceAlongSpline(CurrentDistance));
-			FVector2D EndScale = FVector2D(TargetSpline->GetScaleAtDistanceAlongSpline(CurrentDistance + SegmentLength));
+		FVector2D StartScale = FVector2D(TargetSpline->GetScaleAtDistanceAlongSpline(CurrentDistance));
+		FVector2D EndScale = FVector2D(TargetSpline->GetScaleAtDistanceAlongSpline(CurrentDistance + SegmentLength));
 
-			SplineMesh->SetStartAndEnd(StartPosition, StartTangent, EndPosition, EndTangent);
-			SplineMesh->SetStartScale(StartScale);
-			SplineMesh->SetEndScale(EndScale);
-			SplineMesh->SetStaticMesh(InStaticMesh);
-			SplineMesh->SetMaterial(0, InMaterial);
-			SplineMeshComponentList.Add(SplineMesh);
-		}
-		SplineMeshComponentList.RemoveAt(0);
+		SplineMesh->SetStartAndEnd(StartPosition, StartTangent, EndPosition, EndTangent);
+		SplineMesh->SetStartScale(StartScale);
+		SplineMesh->SetEndScale(EndScale);
+		SplineMesh->SetStaticMesh(InStaticMesh);
+		SplineMesh->SetMaterial(0, InMaterial);
+		SplineMeshComponentList.Add(SplineMesh);
+	}
+	SplineMeshComponentList.RemoveAt(0);
 }
