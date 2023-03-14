@@ -5,18 +5,13 @@
 #include <GameFramework/Character.h>
 #include <Kismet/KismetMathLibrary.h>
 
-void ARotateState::Initialize(const float Degree )
+void ARotateState::Initialize(const FRotator TargetRotation )
 {
-	DegreeToRotate = Degree;
+	TargetCharacterRotation = TargetRotation;
 }
 
 void ARotateState::Execute(ACharacter* const TargetCharacter)
 {
-
-	if (TargetCharacterRotation == FRotator::ZeroRotator)
-	{
-		TargetCharacterRotation.Yaw += DegreeToRotate;
-	}
 
 	FRotator ResultRotation = UKismetMathLibrary::RLerp(TargetCharacter->GetActorRotation(), TargetCharacterRotation ,GetWorld()->DeltaTimeSeconds,true);
 	TargetCharacter->SetActorRotation(ResultRotation);

@@ -3,7 +3,7 @@
 
 #include "MainPlayerController.h"
 #include <Techno_Runner/Player/MainPlayer.h>
-#include <Techno_Runner/Player/PlayerStates/PlayerStateBase.h>
+#include <Techno_Runner/Player/PlayerStates/PlayerStateManager.h>
 //#include <Techno_Runner/Player/PlayerStates/JumpState.h>
 #include <Techno_Runner/Player/PlayerStates/RotateState.h>
 #include <Techno_Runner/Player/PlayerStates/StrafeState.h>
@@ -12,12 +12,11 @@ void AMainPlayerController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (CurrentPlayerState && MainPlayer)
-	{
-		CurrentPlayerState->Execute(Cast<ACharacter>(MainPlayer));
-	}
+	//if (CurrentPlayerState && MainPlayer)
+	//{
+	//	CurrentPlayerState->Execute(Cast<ACharacter>(MainPlayer));
+	//}
 }
-
 void AMainPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
@@ -25,9 +24,9 @@ void AMainPlayerController::BeginPlay()
 	{
 		MainPlayer = Cast<AMainPlayer>(GetPawn());
 	}
-	if (!PlayerStateBase)
+	if (!PlayerStateManagerAsset)
 	{
-		PlayerStateBase = GetWorld()->SpawnActor<APlayerStateBase>(PlayerStateBaseAsset);
+		PlayerStateManager = GetWorld()->SpawnActor<APlayerStateManager>(PlayerStateManagerAsset);
 	}
 }
 
@@ -47,9 +46,8 @@ void AMainPlayerController::StrafeLeft()
 	if (MainPlayer)
 	{
 		LeftStrafeLocation = -1 * MainPlayer->GetActorRightVector() * STRAFE_DISTANCE ;
-		AStrafeState* StrafeState = Cast<AStrafeState>(PlayerStateBase->GetPlayerState(E_STRAFE));
-		StrafeState->Initialize(LeftStrafeLocation);
-		CurrentPlayerState = Cast<APlayerStateBase>(StrafeState);
+		PlayerStateManager->InitializeState<FVector>(E_STRAFE, LeftStrafeLocation);
+		PlayerStateManager->ExecuteState(MainPlayer, true);
 	}
 }
 
@@ -58,19 +56,19 @@ void AMainPlayerController::StrafeRight()
 	if (MainPlayer)
 	{
 		RightStrafeLocation = MainPlayer->GetActorRightVector() * STRAFE_DISTANCE;
-		AStrafeState* StrafeState = Cast<AStrafeState>(PlayerStateBase->GetPlayerState(E_STRAFE));
-		StrafeState->Initialize(LeftStrafeLocation);
-		CurrentPlayerState = Cast<APlayerStateBase>(StrafeState);
+		PlayerStateManager->InitializeState<FVector>(E_STRAFE, RightStrafeLocation);
+		PlayerStateManager->ExecuteState(MainPlayer, true);
 	}
 }
 
 void AMainPlayerController::TurnLeft()
 {
 	if (MainPlayer)
-	{
-		ARotateState* RotateState = Cast<ARotateState>(PlayerStateBase->GetPlayerState(E_ROTATE));
-		RotateState->Initialize(-DEGREE_TO_ROTATE);
-		CurrentPlayerState = Cast<APlayerStateBase>(RotateState);
+	{ 
+		FRotator TargetRotation = MainPlayer->GetActorRotation();
+		TargetRotation.Yaw += (-DEGREE_TO_ROTATE);
+		PlayerStateManager->InitializeState<FRotator>(E_ROTATE, TargetRotation);
+		PlayerStateManager->ExecuteState(MainPlayer, true);
 	}
 }
 
@@ -78,9 +76,10 @@ void AMainPlayerController::TurnRight()
 {
 	if (MainPlayer)
 	{
-		ARotateState* RotateState = Cast<ARotateState>(PlayerStateBase->GetPlayerState(E_ROTATE));
-		RotateState->Initialize(DEGREE_TO_ROTATE);
-		CurrentPlayerState = Cast<APlayerStateBase>(RotateState);
+		FRotator TargetRotation = MainPlayer->GetActorRotation();
+		TargetRotation.Yaw += (DEGREE_TO_ROTATE);
+		PlayerStateManager->InitializeState<FRotator>(E_ROTATE, TargetRotation);
+		PlayerStateManager->ExecuteState(MainPlayer, true);
 	}
 }
 
@@ -88,6 +87,7 @@ void AMainPlayerController::Jump()
 {
 	if (MainPlayer)
 	{
-		MainPlayer->Jump();
+		PlayerStateManager->InitializeState<bool>(E_JUMP, true);
+		PlayerStateManager->ExecuteState(MainPlayer, false);
 	}
 }

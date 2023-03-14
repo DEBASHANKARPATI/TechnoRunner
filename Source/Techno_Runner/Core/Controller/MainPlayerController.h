@@ -6,8 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "MainPlayerController.generated.h"
 class AMainPlayer;
+class APlayerStateManager;
 class APlayerStateBase;
-
 /**
  * Resposible for controlling player inputs 
  */
@@ -25,7 +25,7 @@ protected:
 	AMainPlayer* MainPlayer = nullptr;
 
 	UPROPERTY(EditDefaultsOnly)
-	TSubclassOf<APlayerStateBase> PlayerStateBaseAsset;
+	TSubclassOf<APlayerStateManager> PlayerStateManagerAsset;
 
 private:
 
@@ -48,7 +48,7 @@ private:
 	FVector RightStrafeLocation;
 
 	UPROPERTY(VisibleAnywhere)
-	APlayerStateBase* PlayerStateBase = nullptr;
+	APlayerStateManager* PlayerStateManager = nullptr;
 
 	UPROPERTY(VisibleAnywhere)
 	APlayerStateBase* CurrentPlayerState = nullptr;

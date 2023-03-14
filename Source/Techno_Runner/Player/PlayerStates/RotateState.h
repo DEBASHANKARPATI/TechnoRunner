@@ -14,7 +14,7 @@ class TECHNO_RUNNER_API ARotateState : public APlayerStateBase
 {
 	GENERATED_BODY()
 public:
-	void Initialize(const float Degree);
+	void Initialize(const FRotator Degree);
 	void Execute(ACharacter* const TargetCharacter);
 
 private:
