@@ -27,7 +27,7 @@ void APlayerStateManager::ExecuteState(ACharacter* const Character , bool bCanLo
 	}
 	else
 	{
-		GetWorldTimerManager().SetTimer(StateTimer, StateDelegate,0.0f,false);
+		GetWorldTimerManager().SetTimer(StateTimer, StateDelegate,GetWorld()->GetDeltaSeconds(), false);
 	}
 }
 
@@ -48,7 +48,7 @@ void APlayerStateManager::BeginPlay()
 		JumpState = Cast<AJumpState>(GetWorld()->SpawnActor(JumpStateAsset));
 		if (JumpState)
 		{
-			PlayerStatesMap.Add(EPlayerState::E_JUMP, JumpState);
+			PlayerStatesMap.Add({ EPlayerState::E_JUMP, JumpState });
 		}
 	}
 	if (StrafeStateAsset)
@@ -56,7 +56,7 @@ void APlayerStateManager::BeginPlay()
 		StrafeState = Cast<AStrafeState>(GetWorld()->SpawnActor(StrafeStateAsset));
 		if (StrafeState)
 		{
-			PlayerStatesMap.Add(EPlayerState::E_STRAFE, StrafeState);
+			PlayerStatesMap.Add({ EPlayerState::E_STRAFE, StrafeState });
 		}
 	}
 	if (RotateStateAsset)
@@ -64,9 +64,46 @@ void APlayerStateManager::BeginPlay()
 		RotateState = Cast<ARotateState>(GetWorld()->SpawnActor<ARotateState>(RotateStateAsset));
 		if (RotateState)
 		{
-			PlayerStatesMap.Add(EPlayerState::E_ROTATE, RotateState);
+			PlayerStatesMap.Add({ EPlayerState::E_ROTATE, RotateState });
 		}
 	}
 	
 }
 
+void APlayerStateManager::InitializeState(const EPlayerState StateID, const FString& InitializationParameter)
+{
+	switch (StateID)
+	{
+	case E_JUMP:
+	{
+		CurrentState = Cast<AJumpState>(PlayerStatesMap[E_JUMP]);
+		break;
+	}
+	case E_ROTATE:
+	{
+		FRotator TargetRotation;
+		TargetRotation.InitFromString(InitializationParameter);
+		ARotateState* RotateStateTemp = Cast<ARotateState>(PlayerStatesMap[E_ROTATE]);
+		CurrentState = RotateState;
+		if (RotateState)
+		{
+			RotateState->Initialize(TargetRotation);
+		}
+		break;
+	}
+	case E_STRAFE:
+	{
+		FVector TargetLocation;
+		TargetLocation.InitFromString(InitializationParameter);
+		AStrafeState* StrafeStateTemp = Cast<AStrafeState>(PlayerStatesMap[E_STRAFE]);
+		CurrentState = StrafeState;
+		if (StrafeState)
+		{
+			StrafeState->Initialize(TargetLocation);
+		}
+		break;
+	}
+	default:
+		break;
+	}
+}

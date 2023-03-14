@@ -40,45 +40,9 @@ protected:
 	TSubclassOf<AJumpState> JumpStateAsset;
 
 public:	
-	template<typename T>
-	void InitializeState(const EPlayerState StateID, T InitializationParameter)
-	{
-		switch (StateID)
-		{
-		case E_JUMP:
-		{
-			CurrentState = Cast<AJumpState>(PlayerStatesMap[E_JUMP]);
-			break;
-		}
-		case E_ROTATE:
-		{
-			FRotator TargetRotation = (InitializationParameter); 
-			ARotateState* RotateStateTemp = Cast<ARotateState>(PlayerStatesMap[E_ROTATE]);
-			CurrentState = RotateState;
-			if (RotateState)
-			{
-				RotateState->Initialize(TargetRotation);
-			}
-			break;
-		}
-		case E_STRAFE:
-		{
-			FVector TargetVector = (InitializationParameter);
-			AStrafeState* StrafeStateTemp = Cast<AStrafeState>(PlayerStatesMap[E_STRAFE]);
-			CurrentState = StrafeState;
-			if(StrafeState)
-			{
-				StrafeState->Initialize(TargetVector);
-			}
-			break;
-		}
-		default:
-			break;
-		}
-	}
-
 	APlayerStateBase* GetPlayerState(const EPlayerState PlayerStateID) const;
 	void ExecuteState(ACharacter* const Character , bool bCanLoop = true);
+	void InitializeState(const EPlayerState StateID, const FString& InitializationParameter = "");
 
 private:
 	TMap<TEnumAsByte<EPlayerState>, APlayerStateBase*> PlayerStatesMap; //Map contains states Mapped by state names 

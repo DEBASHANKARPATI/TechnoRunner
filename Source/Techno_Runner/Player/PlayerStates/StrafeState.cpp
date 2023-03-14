@@ -11,6 +11,6 @@ void AStrafeState::Initialize(const FVector& InStrafeLocation)
 
 void AStrafeState::Execute(ACharacter* const Characater)
 {
-	FVector ResultFevctor = UKismetMathLibrary::VLerp(Characater->GetActorLocation(), StrafeLocation, GetWorld()->GetDeltaSeconds());
+	FVector ResultFevctor = UKismetMathLibrary::VLerp(Characater->GetActorLocation(), StrafeLocation, GetWorld()->GetDeltaSeconds()*5);
 	Characater->SetActorLocation(ResultFevctor);
 }

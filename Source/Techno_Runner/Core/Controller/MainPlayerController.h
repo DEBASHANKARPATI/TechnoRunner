@@ -42,7 +42,7 @@ private:
 	void Jump();
 
 	const float STRAFE_DISTANCE = 150.0f;
-	const float DEGREE_TO_ROTATE = 90.0f;
+	const float DEGREE_TO_ROTATE = 10.0f;
 
 	FVector LeftStrafeLocation;
 	FVector RightStrafeLocation;

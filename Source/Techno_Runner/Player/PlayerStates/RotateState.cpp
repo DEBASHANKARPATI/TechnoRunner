@@ -13,7 +13,7 @@ void ARotateState::Initialize(const FRotator TargetRotation )
 void ARotateState::Execute(ACharacter* const TargetCharacter)
 {
 
-	FRotator ResultRotation = UKismetMathLibrary::RLerp(TargetCharacter->GetActorRotation(), TargetCharacterRotation ,GetWorld()->DeltaTimeSeconds,true);
+	FRotator ResultRotation = UKismetMathLibrary::RLerp(TargetCharacter->GetActorRotation(), TargetCharacterRotation ,GetWorld()->DeltaTimeSeconds*5,false);
 	TargetCharacter->SetActorRotation(ResultRotation);
 
 }

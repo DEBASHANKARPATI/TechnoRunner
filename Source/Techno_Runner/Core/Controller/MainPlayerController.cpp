@@ -24,7 +24,7 @@ void AMainPlayerController::BeginPlay()
 	{
 		MainPlayer = Cast<AMainPlayer>(GetPawn());
 	}
-	if (!PlayerStateManagerAsset)
+	if (PlayerStateManagerAsset)
 	{
 		PlayerStateManager = GetWorld()->SpawnActor<APlayerStateManager>(PlayerStateManagerAsset);
 	}
@@ -46,7 +46,7 @@ void AMainPlayerController::StrafeLeft()
 	if (MainPlayer)
 	{
 		LeftStrafeLocation = -1 * MainPlayer->GetActorRightVector() * STRAFE_DISTANCE ;
-		PlayerStateManager->InitializeState<FVector>(E_STRAFE, LeftStrafeLocation);
+		PlayerStateManager->InitializeState(E_STRAFE, LeftStrafeLocation.ToString());
 		PlayerStateManager->ExecuteState(MainPlayer, true);
 	}
 }
@@ -56,7 +56,7 @@ void AMainPlayerController::StrafeRight()
 	if (MainPlayer)
 	{
 		RightStrafeLocation = MainPlayer->GetActorRightVector() * STRAFE_DISTANCE;
-		PlayerStateManager->InitializeState<FVector>(E_STRAFE, RightStrafeLocation);
+		PlayerStateManager->InitializeState(E_STRAFE, RightStrafeLocation.ToString());
 		PlayerStateManager->ExecuteState(MainPlayer, true);
 	}
 }
@@ -67,7 +67,7 @@ void AMainPlayerController::TurnLeft()
 	{ 
 		FRotator TargetRotation = MainPlayer->GetActorRotation();
 		TargetRotation.Yaw += (-DEGREE_TO_ROTATE);
-		PlayerStateManager->InitializeState<FRotator>(E_ROTATE, TargetRotation);
+		PlayerStateManager->InitializeState(E_ROTATE,TargetRotation.ToString());
 		PlayerStateManager->ExecuteState(MainPlayer, true);
 	}
 }
@@ -78,7 +78,7 @@ void AMainPlayerController::TurnRight()
 	{
 		FRotator TargetRotation = MainPlayer->GetActorRotation();
 		TargetRotation.Yaw += (DEGREE_TO_ROTATE);
-		PlayerStateManager->InitializeState<FRotator>(E_ROTATE, TargetRotation);
+		PlayerStateManager->InitializeState(E_ROTATE, TargetRotation.ToString());
 		PlayerStateManager->ExecuteState(MainPlayer, true);
 	}
 }
@@ -87,7 +87,7 @@ void AMainPlayerController::Jump()
 {
 	if (MainPlayer)
 	{
-		PlayerStateManager->InitializeState<bool>(E_JUMP, true);
+		PlayerStateManager->InitializeState(E_JUMP);
 		PlayerStateManager->ExecuteState(MainPlayer, false);
 	}
 }
